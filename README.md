@@ -44,7 +44,7 @@ endwhile
 
 ## Implemenetation
 
-```java
+``` java
 while(!taskQueue.isEmpty()) {
     List<CloudProviderVM> VMList = new ArrayList<>(VMs);
     int n = VMList.size();
@@ -88,7 +88,3 @@ Practical testing will use machines on their respective clouds.
 Cloud 1 : (2X) Google Cloud n1-standard-1 (1 vCPU, 3.75GB RAM)\
 Cloud 2 : (2X) AWS a1.medium (1 vCPU, 2GB RAM)\
 Cloud 3 : (2X) Azure DS1 v2 (2 vCPU, 3.5GB RAM)
-
-## Running
-
-``
