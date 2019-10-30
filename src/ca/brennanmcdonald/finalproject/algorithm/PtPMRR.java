@@ -3,9 +3,10 @@ package ca.brennanmcdonald.finalproject.algorithm;
 import ca.brennanmcdonald.finalproject.CloudProvider;
 import ca.brennanmcdonald.finalproject.Task;
 import ca.brennanmcdonald.finalproject.CloudProviderVM;
-import org.cloudbus.cloudsim.Vm;
 
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 // Price to Performance Modified Round Robin
 public class PtPMRR {
@@ -16,9 +17,10 @@ public class PtPMRR {
     private Thread AlgorithmTask =
             new Thread(new Runnable() {
                 public void run() {
-                    int n =  VMs.size();
-                    int M = CloudProviders.size();
                     while(!taskQueue.isEmpty()) {
+                        List<CloudProviderVM> VMList = new ArrayList<>(VMs);
+                        int n = VMList.size();
+                        int M = CloudProviders.size();
                         Task t = taskQueue.remove();
                         double maximum = calculateRtC(t, VMs.get(0));
                         int index = 0;
@@ -29,8 +31,19 @@ public class PtPMRR {
                                 index = j;
                             }
                         }
-                        for(int k = 1; k <= M; k++) {
-
+                        boolean success = schedule(VMList.get(index), t);
+                        while(!success) {
+                            VMList.remove(VMList.get(index));
+                            index = 0;
+                            maximum = calculateRtC(t, VMs.get(0));
+                            for(int j = 1; j <= n; j++) {
+                                double current = calculateRtC(t, VMList.get(j));
+                                if (maximum < current) {
+                                    maximum = current;
+                                    index = j;
+                                }
+                            }
+                            success = schedule(VMList.get(index), t);
                         }
                     }
                 }
@@ -62,14 +75,13 @@ public class PtPMRR {
         return etc/cpms;
     }
 
-    public void scheduleTask(Task task) {
+    public void addTask(Task task) {
         taskQueue.add(task);
     }
 
     public void scheduleManyTasks(Collection<Task> tasks) {
         taskQueue.addAll(tasks);
     }
-
 
     public void start() {
         AlgorithmTask.start();
@@ -80,5 +92,16 @@ public class PtPMRR {
     }
 
 
+    private boolean schedule(CloudProviderVM v, Task t){
+        try {
+            Future<Boolean> isScheduled = v.schedule(t);
+            while(!isScheduled.isDone()) {
+            }
+            return isScheduled.get();
+        } catch (InterruptedException | ExecutionException e) {
+            return false;
+        }
+
+    }
 }
 
