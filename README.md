@@ -42,6 +42,40 @@ endwhile
 
 ![alt text](img/etc_formula.png "Logo Title Text 2")
 
+## Implemenetation
+
+```java
+while(!taskQueue.isEmpty()) {
+    List<CloudProviderVM> VMList = new ArrayList<>(VMs);
+    int n = VMList.size();
+    int M = CloudProviders.size();
+    Task t = taskQueue.remove();
+    double maximum = calculateRtC(t, VMs.get(0));
+    int index = 0;
+    for(int j = 1; j <= n; j++) {
+        double current = calculateRtC(t, VMs.get(j));
+        if (maximum < current) {
+            maximum = current;
+            index = j;
+        }
+    }
+    boolean success = schedule(VMList.get(index), t);
+    while(!success) {
+        VMList.remove(VMList.get(index));
+        index = 0;
+        maximum = calculateRtC(t, VMs.get(0));
+        for(int j = 1; j <= n; j++) {
+            double current = calculateRtC(t, VMList.get(j));
+            if (maximum < current) {
+                maximum = current;
+                index = j;
+            }
+        }
+        success = schedule(VMList.get(index), t);
+    }
+}
+```
+
 ## Experimental Parameters
 
 A large selection of algorithms to schedule tasks currently exist. I will be comparing my proposed algorithm to these algorithms to test its performance.
@@ -54,3 +88,7 @@ Practical testing will use machines on their respective clouds.
 Cloud 1 : (2X) Google Cloud n1-standard-1 (1 vCPU, 3.75GB RAM)\
 Cloud 2 : (2X) AWS a1.medium (1 vCPU, 2GB RAM)\
 Cloud 3 : (2X) Azure DS1 v2 (2 vCPU, 3.5GB RAM)
+
+## Running
+
+``
