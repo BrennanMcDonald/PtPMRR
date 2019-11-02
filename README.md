@@ -7,7 +7,7 @@ In a multi-cloud scenario we still want to select the best resource to run a tas
 
 ## Proposed Algorithm
 
-The algorithm I am proposing is a modified scheduling algorithm that has been adapted to factor in the cost of a VM and it’s actual performance versus the performance as reported by the cloud provider. The first step is to initialize a queue of all the tasks we want to run. We then start by building a cost to performance ratio for each machine that we want to run the current task on. After some variable initialization, we identify the highest performance to cost ratio. This will not specifically select the fastest or the cheapest machine, but the  machine that will run the fastest for the lowest cost. We then identify the cloud provider that our selected VM is running on and attempt to schedule our task to that Virtual Machine. In the case that the scheduling fails, we attempt to reschedule.
+The algorithm I am proposing is a modified scheduling algorithm that has been adapted to factor in the cost of a VM and it’s actual performance instead of the performance as reported by the cloud provider. The first step is to initialize a queue of all the tasks we want to run. We then start by building a cost to performance ratio for each machine that we want to run the current task on. After some variable initialization, we identify the highest performance to cost ratio. This will not specifically select the fastest or the cheapest machine, but the  machine that will run the fastest for the lowest cost. We then identify the cloud provider that our selected VM is running on and attempt to schedule our task to that Virtual Machine. In the case that the scheduling fails, we attempt to reschedule.
 
 ```
 let Q = A queue of all tasks to run
