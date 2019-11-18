@@ -1,9 +1,8 @@
 package ca.brennanmcdonald.finalproject.cloudprovider;
 
 import ca.brennanmcdonald.finalproject.CloudProvider;
-import ca.brennanmcdonald.finalproject.CloudProviderVM;
+import ca.brennanmcdonald.finalproject.CostPointVM;
 import ca.brennanmcdonald.finalproject.Task;
-import org.cloudbus.cloudsim.Vm;
 
 import java.util.List;
 
@@ -25,7 +24,7 @@ public class Amazon implements CloudProvider {
     }
 
     @Override
-    public List<CloudProviderVM> getVMs() {
+    public List<CostPointVM> getVMs() {
         return null;
     }
 }

@@ -2,7 +2,8 @@ package ca.brennanmcdonald.finalproject.algorithm;
 
 import ca.brennanmcdonald.finalproject.CloudProvider;
 import ca.brennanmcdonald.finalproject.Task;
-import ca.brennanmcdonald.finalproject.CloudProviderVM;
+import ca.brennanmcdonald.finalproject.CostPointVM;
+import org.cloudbus.cloudsim.Cloudlet;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -10,47 +11,13 @@ import java.util.concurrent.Future;
 
 // Price to Performance Modified Round Robin
 public class PtPMRR {
-    private List<CloudProviderVM> VMs;
+    private List<CostPointVM> VMs;
     private List<CloudProvider> CloudProviders;
     private Queue<Task> taskQueue;
 
-    private Thread AlgorithmTask =
-            new Thread(new Runnable() {
-                public void run() {
-                    while(!taskQueue.isEmpty()) {
-                        List<CloudProviderVM> VMList = new ArrayList<>(VMs);
-                        int n = VMList.size();
-                        int M = CloudProviders.size();
-                        Task t = taskQueue.remove();
-                        double maximum = calculateRtC(t, VMs.get(0));
-                        int index = 0;
-                        for(int j = 1; j <= n; j++) {
-                            double current = calculateRtC(t, VMs.get(j));
-                            if (maximum < current) {
-                                maximum = current;
-                                index = j;
-                            }
-                        }
-                        boolean success = schedule(VMList.get(index), t);
-                        while(!success) {
-                            VMList.remove(VMList.get(index));
-                            index = 0;
-                            maximum = calculateRtC(t, VMs.get(0));
-                            for(int j = 1; j <= n; j++) {
-                                double current = calculateRtC(t, VMList.get(j));
-                                if (maximum < current) {
-                                    maximum = current;
-                                    index = j;
-                                }
-                            }
-                            success = schedule(VMList.get(index), t);
-                        }
-                    }
-                }
-            });
 
     public PtPMRR(){
-        VMs = new ArrayList<CloudProviderVM>();
+        VMs = new ArrayList<CostPointVM>();
         taskQueue = new LinkedList<Task>();
     }
 
@@ -59,17 +26,17 @@ public class PtPMRR {
         addManyVMs(cp.getVMs());
     }
 
-    private void addManyVMs(Collection<CloudProviderVM> VMs) {
+    private void addManyVMs(Collection<CostPointVM> VMs) {
         VMs.addAll(VMs);
     }
 
-    private double calculateETC(Task i, CloudProviderVM j) {
-        double f = i.getMips() / j.getMips();
-        double s = (double)(i.getData() / j.getBw());
+    public static double calculateETC(Cloudlet i, CostPointVM j) {
+        double f = i.getCloudletLength() / j.getMips();
+        double s = (double)(i.getCloudletFileSize() / j.getBw());
         return f + s;
     }
 
-    private double calculateRtC(Task i, CloudProviderVM j) {
+    public static double calculateRtC(Cloudlet i, CostPointVM j) {
         double etc = calculateETC(i,j);
         double cpms = j.getCPMS();
         return etc/cpms;
@@ -78,21 +45,16 @@ public class PtPMRR {
     public void addTask(Task task) {
         taskQueue.add(task);
     }
+    public void addTasks(List<Task> tasks) {
+        for(var task :tasks)
+            taskQueue.add(task);
+    }
 
     public void scheduleManyTasks(Collection<Task> tasks) {
         taskQueue.addAll(tasks);
     }
 
-    public void start() {
-        AlgorithmTask.start();
-    }
-
-    public void stop() {
-        AlgorithmTask.interrupt();
-    }
-
-
-    private boolean schedule(CloudProviderVM v, Task t){
+    private boolean schedule(CostPointVM v, Task t){
         try {
             Future<Boolean> isScheduled = v.schedule(t);
             while(!isScheduled.isDone()) {

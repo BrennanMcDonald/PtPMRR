@@ -10,7 +10,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-public class CloudProviderVM extends Vm {
+public class CostPointVM extends Vm {
     @Getter
     @Setter
     private double CPMS;
@@ -19,8 +19,10 @@ public class CloudProviderVM extends Vm {
     @Setter
     private CloudProvider cloudProvider;
 
-    public CloudProviderVM(int id, int userId, double mips, int numberOfPes, int ram, long bw, long size, String vmm, CloudletScheduler cloudletScheduler) {
+    public CostPointVM(int id, int userId, double mips, int numberOfPes, int ram, long bw, long size, String vmm, CloudletScheduler cloudletScheduler, CloudProvider cloudProvider, double CPMS) {
         super(id, userId, mips, numberOfPes, ram, bw, size, vmm, cloudletScheduler);
+        this.CPMS = CPMS;
+        this.cloudProvider = cloudProvider;
     }
 
     public Future<Boolean> schedule(Task t) {
