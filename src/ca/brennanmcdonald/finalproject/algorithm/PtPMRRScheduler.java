@@ -2,9 +2,12 @@ package ca.brennanmcdonald.finalproject.algorithm;
 
 import ca.brennanmcdonald.finalproject.CloudProvider;
 import ca.brennanmcdonald.finalproject.CostPointVM;
+import ca.brennanmcdonald.finalproject.Main;
 import ca.brennanmcdonald.finalproject.cloudprovider.Amazon;
 import ca.brennanmcdonald.finalproject.cloudprovider.Google;
 import ca.brennanmcdonald.finalproject.cloudprovider.Microsoft;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.cloudbus.cloudsim.*;
 import org.cloudbus.cloudsim.core.CloudSim;
 import utils.Constants;
@@ -25,6 +28,7 @@ public class PtPMRRScheduler {
     private static CloudProvider microsoft = new Microsoft();
     private static double[][] commMatrix;
     private static double[][] execMatrix;
+    private static final Logger logger = LogManager.getLogger(PtPMRRScheduler.class);
 
     private static List<Cloudlet> createCloudlet(int userId, int cloudlets, int idShift) {
         // Creates a container to store Cloudlets
@@ -113,8 +117,8 @@ public class PtPMRRScheduler {
         Cloudlet cloudlet;
 
         String indent = "    ";
-        Log.printLine();
-        Log.printLine("========== OUTPUT ==========");
+        /* Log.printLine(); */
+        /* Log.printLine("========== OUTPUT =========="); */
         Log.printLine("Cloudlet ID" + indent + "STATUS" +
                 indent + "Data center ID" +
                 indent + "VM ID" +
@@ -140,32 +144,57 @@ public class PtPMRRScheduler {
         }
         double makespan = calcMakespan(list);
         double cost = calcTotalCost(list);
-        Log.printLine("Makespan using PtPMRR: " + makespan);
-        Log.printLine("Cost using PtPMRR: " + cost);
+        double CPU = calcTotalCPUCost(list);
+        /* Log.printLine("Makespan using PtPMRR: " + makespan); */
+        /* Log.printLine("Cost using PtPMRR: " + cost); */
+        logger.info("Makespan using PtPMRR: " + makespan);
+        logger.info("Cost using PtPMRR: " + cost);
+        logger.info("Total CPU using PtPMRR: " + CPU);
     }
 
     private static double calcMakespan(List<Cloudlet> list) {
-        double makespan = 0;
-        double[] dcWorkingTime = new double[Constants.NO_OF_DATA_CENTERS];
-        for (int i = 0; i < Constants.NO_OF_TASKS; i++) {
-            int dcId = list.get(i).getVmId() % Constants.NO_OF_DATA_CENTERS;
-            if (dcWorkingTime[dcId] != 0) --dcWorkingTime[dcId];
-            dcWorkingTime[dcId] += execMatrix[i][dcId] + commMatrix[i][dcId];
-            makespan = Math.max(makespan, dcWorkingTime[dcId]);
+        try {
+            double makespan = 0;
+            double[] dcWorkingTime = new double[Constants.NO_OF_DATA_CENTERS];
+
+            for (int i = 0; i < Constants.NO_OF_TASKS; i++) {
+                int dcId = list.get(i).getVmId() % Constants.NO_OF_DATA_CENTERS;
+                if (dcWorkingTime[dcId] != 0) --dcWorkingTime[dcId];
+                dcWorkingTime[dcId] += execMatrix[i][dcId] + commMatrix[i][dcId];
+                makespan = Math.max(makespan, dcWorkingTime[dcId]);
+            }
+            return makespan;
+        } catch (Exception ex) {
+            return 0.0;
         }
-        return makespan;
     }
 
     private static double calcTotalCost(List<Cloudlet> list) {
-        double cost = 0;
-        for(var cloudlet : list) {
-            cost += cloudlet.getActualCPUTime() * vmList.stream().filter(x -> x.getId() == cloudlet.getVmId()).findFirst().get().getCPMS();
+        try {
+            double cost = 0;
+            for(var cloudlet : list) {
+                cost += cloudlet.getActualCPUTime() * vmList.stream().filter(x -> x.getId() == cloudlet.getVmId()).findFirst().get().getCPMS();
+            }
+            return cost;
+        } catch (Exception ex) {
+            return 0.0;
         }
-        return cost;
+    }
+
+    private static double calcTotalCPUCost(List<Cloudlet> list) {
+        try {
+            double cost = 0;
+            for(var cloudlet : list) {
+                cost += cloudlet.getActualCPUTime();
+            }
+            return cost;
+        } catch (Exception ex) {
+            return 0.0;
+        }
     }
 
     public static void run() {
-        Log.printLine("Starting SJF Scheduler...");
+        /* Log.printLine("Starting SJF Scheduler..."); */
 
         new GenerateMatrices();
         execMatrix = GenerateMatrices.getExecMatrix();
@@ -205,10 +234,10 @@ public class PtPMRRScheduler {
 
             printCloudletList(newList);
 
-            Log.printLine(PtPMRRScheduler.class.getName() + " finished!");
+            /* Log.printLine(PtPMRRScheduler.class.getName() + " finished!"); */
         } catch (Exception e) {
             e.printStackTrace();
-            Log.printLine("The simulation has been terminated due to an unexpected error");
+            /* Log.printLine("The simulation has been terminated due to an unexpected error"); */
         }
     }
 }

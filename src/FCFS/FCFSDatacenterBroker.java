@@ -50,7 +50,7 @@ public class FCFSDatacenterBroker extends DatacenterBroker {
     protected void cloudletExecution(Cloudlet cloudlet) {
 
         if (getCloudletList().size() == 0 && cloudletsSubmitted == 0) { // all cloudlets executed
-            Log.printLine(CloudSim.clock() + ": " + getName() + ": All Cloudlets executed. Finishing...");
+            /* Log.printLine(CloudSim.clock() + ": " + getName() + ": All Cloudlets executed. Finishing..."); */
             clearDatacenters();
             finishExecution();
         } else { // some cloudlets haven't finished yet

@@ -99,7 +99,7 @@ public class SJFDatacenterBroker extends DatacenterBroker {
     protected void cloudletExecution(Cloudlet cloudlet) {
 
         if (getCloudletList().size() == 0 && cloudletsSubmitted == 0) { // all cloudlets executed
-            Log.printLine(CloudSim.clock() + ": " + getName() + ": All Cloudlets executed. Finishing...");
+            /* Log.printLine(CloudSim.clock() + ": " + getName() + ": All Cloudlets executed. Finishing..."); */
             clearDatacenters();
             finishExecution();
         } else { // some cloudlets haven't finished yet
@@ -133,7 +133,7 @@ public class SJFDatacenterBroker extends DatacenterBroker {
             String datacenterName = CloudSim.getEntityName(datacenterId);
 
             if (!getVmsToDatacentersMap().containsKey(vm.getId())) {
-                Log.printLine(CloudSim.clock() + ": " + getName() + ": Trying to Create VM #" + vm.getId() + " in " + datacenterName);
+                /* Log.printLine(CloudSim.clock() + ": " + getName() + ": Trying to Create VM #" + vm.getId() + " in " + datacenterName); */
                 sendNow(datacenterId, CloudSimTags.VM_CREATE_ACK, vm);
                 numberOfVmsAllocated++;
             }

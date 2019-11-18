@@ -15,6 +15,8 @@ import RoundRobin.RoundRobinScheduler;
 import SJF.SJF_Scheduler;
 import ca.brennanmcdonald.finalproject.algorithm.PtPMRR;
 import ca.brennanmcdonald.finalproject.algorithm.PtPMRRScheduler;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * A simple example showing how to create a data center with one host and run one cloudlet on it.
@@ -22,19 +24,21 @@ import ca.brennanmcdonald.finalproject.algorithm.PtPMRRScheduler;
 public class Main {
 
     private static List<CloudProvider> cloudProviders;
+    private static final Logger logger = LogManager.getLogger(Main.class);
 
     @SuppressWarnings("unused")
     public static void main(String[] args) {
 
         // Run PtPMRR
 
-        PtPMRRScheduler.run();
-        FCFS_Scheduler.run();
-
-        RoundRobinScheduler.run();
-
-        SJF_Scheduler.run();
-
+        for(int i = 0; i < 100000; i++) {
+            logger.info("===================================");
+            PtPMRRScheduler.run();
+            FCFS_Scheduler.run();
+            RoundRobinScheduler.run();
+            SJF_Scheduler.run();
+            logger.info("===================================");
+        }
     }
 
 }

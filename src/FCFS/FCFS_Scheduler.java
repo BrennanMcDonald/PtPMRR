@@ -106,7 +106,7 @@ public class FCFS_Scheduler {
     }
 
     public static void run() {
-        Log.printLine("Starting FCFS Scheduler...");
+        /* Log.printLine("Starting FCFS Scheduler..."); */
 
         new GenerateMatrices();
         execMatrix = GenerateMatrices.getExecMatrix();
@@ -147,10 +147,10 @@ public class FCFS_Scheduler {
 
             printCloudletList(newList);
 
-            Log.printLine(FCFS_Scheduler.class.getName() + " finished!");
+            /* Log.printLine(FCFS_Scheduler.class.getName() + " finished!"); */
         } catch (Exception e) {
             e.printStackTrace();
-            Log.printLine("The simulation has been terminated due to an unexpected error");
+            /* Log.printLine("The simulation has been terminated due to an unexpected error"); */
         }
     }
 
@@ -168,8 +168,8 @@ public class FCFS_Scheduler {
         Cloudlet cloudlet;
 
         String indent = "    ";
-        Log.printLine();
-        Log.printLine("========== OUTPUT ==========");
+        /* Log.printLine(); */
+        /* Log.printLine("========== OUTPUT =========="); */
         Log.printLine("Cloudlet ID" + indent + "STATUS" +
                 indent + "Data center ID" +
                 indent + "VM ID" +
@@ -195,30 +195,52 @@ public class FCFS_Scheduler {
         }
         double makespan = calcMakespan(list);
         double cost = calcTotalCost(list);
-        Log.printLine("Makespan using FCFS: " + makespan);
-        Log.printLine("Cost using FCFS: " + cost);
+        double CPU = calcTotalCPUCost(list);
+        /* Log.printLine("Makespan using FCFS: " + makespan); */
+        /* Log.printLine("Cost using FCFS: " + cost); */
         logger.info("Makespan using FCFS: " + makespan);
         logger.info("Cost using FCFS: " + cost);
+        logger.info("Total CPU using FCFS: " + CPU);
     }
 
     private static double calcMakespan(List<Cloudlet> list) {
-        double makespan = 0;
-        double[] dcWorkingTime = new double[Constants.NO_OF_DATA_CENTERS];
+        try {
+            double makespan = 0;
+            double[] dcWorkingTime = new double[Constants.NO_OF_DATA_CENTERS];
 
-        for (int i = 0; i < Constants.NO_OF_TASKS; i++) {
-            int dcId = list.get(i).getVmId() % Constants.NO_OF_DATA_CENTERS;
-            if (dcWorkingTime[dcId] != 0) --dcWorkingTime[dcId];
-            dcWorkingTime[dcId] += execMatrix[i][dcId] + commMatrix[i][dcId];
-            makespan = Math.max(makespan, dcWorkingTime[dcId]);
+            for (int i = 0; i < Constants.NO_OF_TASKS; i++) {
+                int dcId = list.get(i).getVmId() % Constants.NO_OF_DATA_CENTERS;
+                if (dcWorkingTime[dcId] != 0) --dcWorkingTime[dcId];
+                dcWorkingTime[dcId] += execMatrix[i][dcId] + commMatrix[i][dcId];
+                makespan = Math.max(makespan, dcWorkingTime[dcId]);
+            }
+            return makespan;
+        } catch (Exception ex) {
+            return 0.0;
         }
-        return makespan;
     }
 
     private static double calcTotalCost(List<Cloudlet> list) {
+        try {
         double cost = 0;
         for(var cloudlet : list) {
             cost += cloudlet.getActualCPUTime() * vmList.stream().filter(x -> x.getId() == cloudlet.getVmId()).findFirst().get().getCPMS();
         }
         return cost;
+    } catch (Exception ex) {
+        return 0.0;
+    }
+    }
+
+    private static double calcTotalCPUCost(List<Cloudlet> list) {
+        try {
+        double cost = 0;
+        for(var cloudlet : list) {
+            cost += cloudlet.getActualCPUTime();
+        }
+        return cost;
+        } catch (Exception ex) {
+            return 0.0;
+        }
     }
 }
