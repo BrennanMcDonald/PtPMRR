@@ -88,3 +88,19 @@ Practical testing will use machines on their respective clouds.
 Cloud 1 : (2X) Google Cloud n1-standard-1 (1 vCPU, 3.75GB RAM)\
 Cloud 2 : (2X) AWS a1.medium (1 vCPU, 2GB RAM)\
 Cloud 3 : (2X) Azure DS1 v2 (2 vCPU, 3.5GB RAM)
+
+
+## Results
+
+
+By using this algorithm, costs were reduced by up to 20%
+
+![alt text](img/Figure_4.png "Cost")
+
+Cpu Usage remained mostly the same
+
+![alt text](img/Figure_5.png "CPU usage")
+
+Makespan scaled with the traditional round robin and smallest job first, however due to the naive nature of first come first serve it scaled much better than the other algorithms compared to.
+
+![alt text](img/Figure_6.png "Makespan")
