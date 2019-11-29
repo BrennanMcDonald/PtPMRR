@@ -31,7 +31,7 @@ public class Main {
 
         // Run PtPMRR
 
-        for(int i = 0; i < 100000; i++) {
+        for(int i = 0; i < 1000; i++) {
             logger.info("===================================");
             PtPMRRScheduler.run();
             FCFS_Scheduler.run();
